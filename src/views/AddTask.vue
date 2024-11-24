@@ -1,6 +1,5 @@
 <template>
-    <div class="add-task-container">
-        <h1>Añadir Tarea</h1>
+<h1 data-v-198bdaee="" class="text-center text-success mb-4">Añadir Tarea</h1>        <h1>Añadir Tarea</h1>
         <div class="input-group">
             <input 
                 v-model="newTask" 
@@ -26,37 +25,41 @@
 </template>
 
 <script>
+import { store, mutations } from '@/store';
+
 export default {
     name: "AddTask",
     data() {
         return {
             newTask: "", // Campo de entrada para la nueva tarea
-            tasks: [],   // Lista de tareas locales
         };
+    },
+    computed: {
+        tasks() {
+            return store.tasks; // Obtiene las tareas del estado global
+        }
     },
     methods: {
         addTask() {
             if (this.newTask.trim() === "") return;
-
-            const newTask = {
-                todo: this.newTask,
-                completed: false,
-                id: Date.now(), 
-            };
-
-            // Añadir la nueva tarea al inicio de la lista
-            this.tasks.unshift(newTask);
+            mutations.addTask(this.newTask); // Añade la tarea al estado global
             this.newTask = ""; // Limpiar el campo de entrada después de agregar
         },
 
         // Elimina una tarea específica de la lista
         deleteTask(task) {
-            this.tasks = this.tasks.filter((t) => t.id !== task.id);
+            const taskIndex = store.tasks.findIndex((t) => t.id === task.id);
+            if (taskIndex !== -1) {
+                mutations.deleteTask(taskIndex); // Elimina la tarea del estado global
+            }
         },
 
         // Cambia el estado de la tarea entre completada y no completada
         toggleTaskCompletion(task) {
-            task.completed = !task.completed;
+            const taskIndex = store.tasks.findIndex((t) => t.id === task.id);
+            if (taskIndex !== -1) {
+                mutations.toggleTaskCompletion(taskIndex); // Cambia el estado de la tarea
+            }
         },
     },
 };
@@ -107,4 +110,19 @@ export default {
     text-decoration: line-through;
     color: gray;
 }
+.container[data-v-198bdaee] {
+    max-width: 800px;
+    padding: 20px;
+}
+.mt-4 {
+    margin-top: 1.5rem !important;
+}
+.mb-4 {
+    margin-bottom: 1.5rem !important;
+}
+.text-center {
+    text-align: center !important;
+}
+
+
 </style>
